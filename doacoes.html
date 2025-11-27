@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoCalc — Doações</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="pagamento.js" defer></script>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div class="logo" aria-hidden="true">EC</div>
+      <div>
+        <h1>Contribua com a redução de carbono</h1>
+        <p class="lead">Doações simbólicas para demonstrar o fluxo — projeto escolar.</p>
+      </div>
+    </header>
+
+    <section class="card" aria-labelledby="doar-title">
+      <h2 id="doar-title">Fazer uma doação</h2>
+
+      <p class="small-muted">
+        Por se tratar de um projeto acadêmico, <strong>os valores não possuem destino real</strong>.
+        Esta funcionalidade demonstra como uma integração de pagamentos funcionaria em um sistema completo.
+      </p>
+
+ <form id="formPagamento" action="salvar_pagamento.php" method="POST">
+    <div class="row">
+      <label for="donorName">Nome</label>
+      <input id="donorName" name="nome" type="text" required placeholder="Seu nome completo" />
+    </div>
+
+    <div class="row">
+      <label for="donorEmail">Email</label>
+      <input id="donorEmail" name="email" type="email" required placeholder="seu@exemplo.com" />
+    </div>
+
+    <div class="row">
+      <label for="donationAmount">Valor da doação (R$)</label>
+      <input id="donationAmount" name="valor" type="number" step="0.01" min="1" value="10" required />
+    </div>
+
+    <div class="row">
+      <label>Forma de pagamento (simulada)</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="radio" name="payMethod" value="pix" checked /> Pix
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="radio" name="payMethod" value="card" /> Cartão
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="radio" name="payMethod" value="boleto" /> Boleto
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="donationNote">Observação (opcional)</label>
+      <textarea id="donationNote" name="obs" rows="3" placeholder="Mensagem opcional (ex.: 'plantar árvores')"></textarea>
+    </div>
+
+    <div class="actions" style="margin-top:12px;">
+      <button type="submit" class="primary">Confirmar doação</button>
+      <a href="index.html" class="ghost" style="display:inline-flex;align-items:center;padding:10px 12px;border-radius:10px;text-decoration:none;">Voltar</a>
+    </div>
+</form>
+
+    </section>
+
+    <section class="card" aria-live="polite" id="donationResult" style="display:none;margin-top:10px;"></section>
+
+    <footer style="margin-top:12px;">
+      <div class="small-muted">Funcionalidade demonstrativa — sem transferência real de valores.</div>
+    </footer>
+  </div>
+</body>
+</html>
