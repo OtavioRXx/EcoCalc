@@ -33,19 +33,21 @@ Como parte adicional do projeto, foi criada uma página de doações simuladas, 
 
 O projeto utiliza duas tabelas:
 - historico_calculos – registra os cálculos da calculadora
-- doacoes – armazena as doações simuladas
+- pagamento – armazena as doações simuladas
 Scripts SQL estão incluídos no repositório.
 
 📁 Estrutura do projeto
 /EcoCalc
 │ index.html
 │ sobre.html
-│ pagamento.html
+│ doacoes.html
 │ style.css
 │ javascript.js
-│ salvar.php
+│ pagamento.js
+│ save.php
 │ carregar_historico.php
 │ salvar_pagamento.php
+│ conexao.php
 └─ /imagens
 
 👥 Equipe
