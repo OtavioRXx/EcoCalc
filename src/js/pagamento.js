@@ -1,6 +1,7 @@
 // doacoes.js — controla a página de doações (envia para save_donation.php)
+console.log("PAGAMENTO.JS NOVO");
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('donationForm');
+  const form = document.getElementById('formPagamento');
   const resultBox = document.getElementById('donationResult');
 
   form.addEventListener('submit', async (e) => {
@@ -9,11 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     resultBox.innerHTML = '';
 
     // coletar e validar
-    const name = form.donorName.value.trim();
-    const email = form.donorEmail.value.trim();
-    const amount = parseFloat(form.donationAmount.value);
-    const method = form.payMethod.value;
-    const note = form.donationNote.value.trim();
+    const name = document.getElementById("donorName").value.trim();
+    const email = document.getElementById("donorEmail").value.trim();
+    const amount = parseFloat(document.getElementById("donationAmount").value);
+    const method = document.querySelector('input[name="payMethod"]:checked').value;
+    const note = document.getElementById("donationNote").value.trim();
 
     if (!name || !email || isNaN(amount) || amount <= 0) {
       resultBox.style.display = 'block';
@@ -53,7 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // chama endpoint PHP (que você implementará em seguida)
-        const res = await fetch('save_donation.php', {
+        console.log("Vai enviar para:", "../backend/salvar_pagamento.php");
+        const res = await fetch('../backend/salvar_pagamento.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: payload
@@ -83,6 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // função simples para escapar HTML (evita XSS no resultado)
   function escapeHtml(s) {
-    return (''+s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    return ('' + s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 });
