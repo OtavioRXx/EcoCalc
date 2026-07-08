@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoCalc — Calculadora de Pegada de Carbono</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Script principal -->
+  <script src="javascript.js" defer></script>
+</head>
+<body>
+  <div class="container" role="main">
+
+    <header>
+      <div class="logo" aria-hidden="true">EC</div>
+      <div>
+        <h1>EcoCalc — Calculadora de Pegada de Carbono</h1>
+        <p class="lead">Compare suas emissões com médias nacionais e internacionais.</p>
+      </div>
+    </header>
+
+    <!-- Botão flutuante de calcular agora (posição fixa via CSS) -->
+    <button id="btnScrollCalc" class="scroll-btn" title="Ir para calculadora">Calcular agora ↓</button>
+
+    <!-- Slider de fontes de energia -->
+    <section class="card" id="fontesEnergia">
+      <h2>Fontes de energia e suas emissões</h2>
+      <div class="slider-container">
+        <button class="btn-prev" aria-label="Anterior">‹</button>
+        <div class="slider" id="sliderEnergia"></div>
+        <button class="btn-next" aria-label="Próximo">›</button>
+      </div>
+    </section>
+
+    <!-- Top países -->
+    <section class="card" id="topPaises">
+      <h2>Top 10 países que mais emitem CO₂</h2>
+      <table class="tabela-co2" aria-describedby="topPaises">
+        <thead>
+          <tr>
+            <th>Posição</th>
+            <th>País</th>
+            <th>Emissões (Gt/ano)</th>
+          </tr>
+        </thead>
+        <tbody id="listaPaises"></tbody>
+      </table>
+    </section>
+
+    <div class="main">
+      <!-- FORM -->
+      <section class="card">
+        <h2>Seu perfil de hábitos</h2>
+
+        <form id="ecoForm" autocomplete="off" novalidate>
+          <div class="row">
+            <label for="transporteTipo">Transporte principal</label>
+            <select id="transporteTipo" name="transporteTipo">
+              <option value="carro">Carro</option>
+              <option value="onibus">Ônibus</option>
+              <option value="moto">Moto</option>
+              <option value="bicicleta">Bicicleta</option>
+              <option value="a_pe">A pé</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="kmSemana">Quilômetros por semana</label>
+            <input type="number" id="kmSemana" name="kmSemana" value="20" />
+          </div>
+
+          <div class="row">
+            <label for="refeicoesCarne">Refeições com carne por semana</label>
+            <input type="number" id="refeicoesCarne" name="refeicoesCarne" value="7" />
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="kwhMes">Consumo de energia (kWh/mês)</label>
+              <input type="number" id="kwhMes" name="kwhMes" value="180" />
+            </div>
+            <div>
+              <label for="contaMes">Conta de luz (R$)</label>
+              <input type="number" id="contaMes" name="contaMes" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="roupasMes">Peças de roupa novas/mês</label>
+              <input type="number" id="roupasMes" name="roupasMes" value="1" />
+            </div>
+            <div>
+              <label for="eletronicosAno">Eletrônicos novos/ano</label>
+              <input type="number" id="eletronicosAno" name="eletronicosAno" value="0" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary" id="btnCalcular">Calcular</button>
+            <button type="button" class="ghost" id="btnReset">Limpar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- RESULTADOS -->
+      <section class="card">
+        <div class="result-head">
+          <div>
+            <h3>Resultado</h3>
+            <p class="small-muted">Veja suas emissões e compare com médias.</p>
+          </div>
+          <div>
+            <div class="big-number" id="resultadoResumo">— kg CO₂ / semana</div>
+            <div id="comparacoes" class="small-muted" style="margin-top:6px;">—</div>
+          </div>
+        </div>
+
+        <div class="chart-wrap">
+          <div class="chart-card">
+            <canvas id="emissionsChart" aria-label="Gráfico de emissões por categoria"></canvas>
+          </div>
+          <div class="comparison-card">
+            <h4 style="margin-top:0">Comparação com médias</h4>
+            <div style="height:220px;">
+              <canvas id="comparisonChart" aria-label="Gráfico de comparação"></canvas>
+            </div>
+            <div id="mediasInfo" class="small-muted" style="margin-top:8px;">Fonte: exemplos — integre API/DB quando pronto.</div>
+            <div style="margin-top:10px;">
+              <button id="btnAtualizarMedias" class="ghost">Atualizar médias</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Dicas personalizadas</h3>
+        <div id="dicasArea">
+          <div class="tip">
+            <strong>Dica:</strong> Preencha o formulário e clique em "Calcular" para ver sugestões específicas.
+          </div>
+        </div>
+      </section>
+
+      <button id="btnHistorico" class="ghost open-history">Histórico de cálculos</button>
+
+      <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <h3>Histórico de Pegadas Registradas</h3>
+            <div id="historyList">Carregando...</div>
+            <button id="closeModal" class="primary close-btn">Fechar</button>
+        </div>
+      </div>
+
+    </div>
+
+    <footer style="margin-top:16px;">
+      <div>EcoCalc — estimativas aproximadas.</div>
+      <div class="menu-botoes">
+  <a href="doacoes.html" class="botao-menu primary">Fazer Doação</a>
+  <a href="sobre.html" class="botao-menu ghost">Sobre o Projeto</a>
+</div>
+
+    </footer>
+  </div>
+</body>
+</html>
