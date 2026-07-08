@@ -254,12 +254,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====== slider de fontes de energia ======
   const fontes = [
-    { nome: "Carvão", emissao: "~820 g CO₂/kWh", img: "imagens/carvao.jpg", desc: "Fonte fóssil com alta emissão." },
-    { nome: "Gás Natural", emissao: "~490 g CO₂/kWh", img: "imagens/gas.webp", desc: "Menos poluente que o carvão, ainda fóssil." },
-    { nome: "Petróleo", emissao: "~650 g CO₂/kWh", img: "imagens/petroleo.png", desc: "Usado em termelétricas e transporte." },
-    { nome: "Hidrelétrica", emissao: "~24 g CO₂/kWh", img: "imagens/hidreletrica.jpg", desc: "Renovável; variação depende do projeto." },
-    { nome: "Eólica", emissao: "~12 g CO₂/kWh", img: "imagens/eolica.jpg", desc: "Renovável e de baixíssimas emissões." },
-    { nome: "Solar", emissao: "~40 g CO₂/kWh", img: "imagens/solar.jpg", desc: "Renovável, limpo e escalável." }
+    { nome: "Carvão", emissao: "~820 g CO₂/kWh", img: "../assets/carvao.jpg", desc: "Fonte fóssil com alta emissão." },
+    { nome: "Gás Natural", emissao: "~490 g CO₂/kWh", img: "../assets/gas.webp", desc: "Menos poluente que o carvão, ainda fóssil." },
+    { nome: "Petróleo", emissao: "~650 g CO₂/kWh", img: "../assets/petroleo.png", desc: "Usado em termelétricas e transporte." },
+    { nome: "Hidrelétrica", emissao: "~24 g CO₂/kWh", img: "../assets/hidreletrica.jpg", desc: "Renovável; variação depende do projeto." },
+    { nome: "Eólica", emissao: "~12 g CO₂/kWh", img: "../assets/eolica.jpg", desc: "Renovável e de baixíssimas emissões." },
+    { nome: "Solar", emissao: "~40 g CO₂/kWh", img: "../assets/solar.jpg", desc: "Renovável, limpo e escalável." }
   ];
 
   const slider = document.getElementById('sliderEnergia');
