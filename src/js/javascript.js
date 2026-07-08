@@ -1,4 +1,4 @@
-// javascript.js - EcoCalc
+// javascript.js - EcoCalc (coloque este arquivo na mesma pasta)
 document.addEventListener("DOMContentLoaded", () => {
   console.log("JS carregado!");
 
@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     consumo: { roupa_peca: 7.0, eletronico_unidade: 150 }
   };
 
+  // DOM refs
   const form = document.getElementById("ecoForm");
   const resultadoResumo = document.getElementById("resultadoResumo");
   const dicasArea = document.getElementById("dicasArea");
@@ -22,9 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnAtualizarMedias = document.getElementById("btnAtualizarMedias");
   const btnScrollCalc = document.getElementById("btnScrollCalc");
 
+  // charts
   let emissionsChart = null;
   let comparisonChart = null;
 
+  // ====== cálculo ======
   function calcularPegada(vals) {
     const semanasPorMes = 4.345;
     const kmSemana = Number(vals.kmSemana) || 0;
@@ -52,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return { porCategoria, total };
   }
 
+  // ====== gráficos ======
   function atualizarGrafico(catObj) {
     const labels = Object.keys(catObj).map(k => k.replace('_',' '));
     const data = Object.values(catObj).map(v => Math.round(v * 100) / 100);
@@ -103,12 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
     comparisonChart.update();
   }
 
+  // ====== dicas ======
   function gerarDicas(cat) {
     const entries = Object.entries(cat).sort((a,b) => b[1]-a[1]);
     const top = entries[0] || ['—',0];
     const total = Object.values(cat).reduce((s,v)=>s+v,0) || 1;
     const dicas = [];
-    dicas.push({titulo:'Comece com pequenas mudanças', texto:'Trocar uma refeição com carne por semana por uma opção vegetal e substituir um trajeto de carro por transporte público já reduzem significativamente sua pegada.'});
+    dicas.push({titulo:'Comece com pequenas mudanças', texto:'Trocar uma refeição com carne por semana por uma opção vegetal e substituir um trajeto de carro por transporte público já reduzem emissões.'});
     if (top[0] === 'Transporte') dicas.push({titulo:`Transporte — ${Math.round((top[1]/total)*100)}% da sua pegada`, texto:'Reduzir viagens de carro e priorizar transporte coletivo ou bicicleta.'});
     if (top[0] === 'Alimentacao') dicas.push({titulo:`Alimentação — ${Math.round((top[1]/total)*100)}%`, texto:'Reduzir carne vermelha e preferir vegetais.'});
     if (top[0] === 'Energia') dicas.push({titulo:`Energia — ${Math.round((top[1]/total)*100)}%`, texto:'Melhorar eficiência energética, trocar lâmpadas por LED.'});
@@ -116,8 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return dicas;
   }
 
+  // ====== salvar histórico via fetch -->
   function salvarHistorico(total) {
-    fetch("../backend/save.php", {
+    fetch("save.php", {
       method: "POST",
       headers: {"Content-Type":"application/x-www-form-urlencoded"},
       body: "total_co2=" + encodeURIComponent(total)
@@ -127,9 +133,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(err => console.error("Erro ao salvar:", err));
   }
 
+  // ====== carregar histórico (usado quando abre modal) -->
   function carregarHistorico() {
     historyList.innerHTML = 'Carregando...';
-    fetch("../backend/carregar_historico.php")
+    fetch("carregar_historico.php")
       .then(r => r.json())
       .then(data => {
         if (!data || !data.length) { historyList.innerHTML = "<p>Nenhum registro salvo.</p>"; return; }
@@ -143,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(err => { historyList.innerHTML = "<p>Erro ao carregar histórico.</p>"; console.error(err); });
   }
 
+  // ====== eventos do form ======
   form.addEventListener('submit', e => {
     e.preventDefault();
     const vals = {
@@ -165,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     salvarHistorico(calc.total);
   });
 
+  // reset
   btnReset.addEventListener('click', () => {
     form.reset();
     form.kmSemana.value = 20;
@@ -175,19 +184,26 @@ document.addEventListener("DOMContentLoaded", () => {
     resultadoResumo.textContent = '— kg CO₂ / semana';
     comparacoes.textContent = '—';
     dicasArea.innerHTML = '<div class="tip"><strong>Dica:</strong> Preencha o formulário e clique em "Calcular" para ver sugestões específicas.</div>';
+    try {
+      localStorage.removeItem('eco_input');
+      localStorage.removeItem('eco_saved_last');
+    } catch(e){}
     if (emissionsChart) { emissionsChart.destroy(); emissionsChart = null; }
     if (comparisonChart) { comparisonChart.data.datasets[0].data = [0, (window.lastLoadedMedias?.nacional)||0, (window.lastLoadedMedias?.internacional)||0]; comparisonChart.update(); }
   });
 
+  // histórico modal
   btnHistorico.addEventListener('click', () => {
     historyModal.classList.remove('hidden');
     carregarHistorico();
   });
   closeModal.addEventListener('click', () => historyModal.classList.add('hidden'));
 
+  // atualizar médias (placeholder)
   btnAtualizarMedias.addEventListener('click', async () => {
     btnAtualizarMedias.disabled = true; btnAtualizarMedias.textContent = 'Buscando...';
     try {
+      // mock - substitua por fetch real
       const medias = await (async ()=>({nacional:42.5, internacional:55.2}))();
       document.getElementById('mediasInfo').textContent = 'Fonte: dados de exemplo (substituir por API/DB).';
       const savedInput = JSON.parse(localStorage.getItem('eco_input') || 'null');
@@ -197,12 +213,24 @@ document.addEventListener("DOMContentLoaded", () => {
     btnAtualizarMedias.disabled = false; btnAtualizarMedias.textContent = 'Atualizar médias';
   });
 
+  // botão scroll para calculadora
   btnScrollCalc.addEventListener('click', () => {
     document.getElementById('ecoForm').scrollIntoView({behavior:'smooth', block:'center'});
   });
 
+  // ====== inicializa gráficos ======
   inicializarGraficoComparacao();
 
+  // tenta restaurar estado salvo (opcional)
+  try {
+    const saved = JSON.parse(localStorage.getItem('eco_input') || 'null');
+    if (saved) {
+      Object.entries(saved).forEach(([k,v])=>{ if (form[k] !== undefined) form[k].value = v; });
+      // não disparamos submit automático aqui para evitar salvar sem querer
+    }
+  } catch(e){ console.warn('restore err', e); }
+
+  // ====== top países (usa imagens da flagcdn ou local se preferir) ======
   const paises = [
     { nome: "China", code:"cn", co2:11.5 },
     { nome: "Estados Unidos", code:"us", co2:5.0 },
@@ -224,13 +252,14 @@ document.addEventListener("DOMContentLoaded", () => {
     </tr>
   `).join('');
 
+  // ====== slider de fontes de energia ======
   const fontes = [
-    { nome: "Carvão", emissao: "~820 g CO₂/kWh", img: "../images/carvao.jpg", desc: "Fonte fóssil com alta emissão." },
-    { nome: "Gás Natural", emissao: "~490 g CO₂/kWh", img: "../images/gas.webp", desc: "Menos poluente que o carvão, ainda fóssil." },
-    { nome: "Petróleo", emissao: "~650 g CO₂/kWh", img: "../images/petroleo.png", desc: "Usado em termelétricas e transporte." },
-    { nome: "Hidrelétrica", emissao: "~24 g CO₂/kWh", img: "../images/hidreletrica.jpg", desc: "Renovável; variação depende do projeto." },
-    { nome: "Eólica", emissao: "~12 g CO₂/kWh", img: "../images/eolica.jpg", desc: "Renovável e de baixíssimas emissões." },
-    { nome: "Solar", emissao: "~40 g CO₂/kWh", img: "../images/solar.jpg", desc: "Renovável, limpo e escalável." }
+    { nome: "Carvão", emissao: "~820 g CO₂/kWh", img: "imagens/carvao.jpg", desc: "Fonte fóssil com alta emissão." },
+    { nome: "Gás Natural", emissao: "~490 g CO₂/kWh", img: "imagens/gas.webp", desc: "Menos poluente que o carvão, ainda fóssil." },
+    { nome: "Petróleo", emissao: "~650 g CO₂/kWh", img: "imagens/petroleo.png", desc: "Usado em termelétricas e transporte." },
+    { nome: "Hidrelétrica", emissao: "~24 g CO₂/kWh", img: "imagens/hidreletrica.jpg", desc: "Renovável; variação depende do projeto." },
+    { nome: "Eólica", emissao: "~12 g CO₂/kWh", img: "imagens/eolica.jpg", desc: "Renovável e de baixíssimas emissões." },
+    { nome: "Solar", emissao: "~40 g CO₂/kWh", img: "imagens/solar.jpg", desc: "Renovável, limpo e escalável." }
   ];
 
   const slider = document.getElementById('sliderEnergia');
@@ -251,3 +280,4 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector('.btn-prev').addEventListener('click', ()=> { if (slideIndex > 0) slideIndex--; updateSlider(); });
 
 });
+
